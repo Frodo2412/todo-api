@@ -10,6 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TaskRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
+
   protected val dbConfig = dbConfigProvider.get[JdbcProfile]
 
   import dbConfig._
@@ -32,5 +33,7 @@ class TaskRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
 
   def create(form: TaskForm): Future[Task] =
     db.run(tasks returning tasks.map(_.id) into ((x, id) => x.copy(id = Some(id))) += new Task(form))
+
+  def delete(id: Int): Future[Int] = db.run(tasks.filter(_.id === id).delete)
 
 }

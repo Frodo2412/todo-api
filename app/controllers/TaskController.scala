@@ -25,4 +25,6 @@ class TaskController @Inject() (repo: TaskRepository, val controllerComponents: 
       }
   }
 
+  def delete(id: Int): Action[AnyContent] = Action.async { repo.delete(id).map(_ => Ok) }
+
 }
