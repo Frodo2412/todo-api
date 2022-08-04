@@ -36,4 +36,8 @@ class TaskRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
 
   def delete(id: Int): Future[Int] = db.run(tasks.filter(_.id === id).delete)
 
+  def update(id: Int, form: TaskForm): Future[Int] = db.run((for {
+    t <- tasks if t.id === id
+  } yield (t.title, t.description)).update(form.title, form.description))
+
 }
