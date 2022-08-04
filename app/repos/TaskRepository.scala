@@ -1,6 +1,6 @@
 package repos
 
-import model.Task
+import model.{Task, TaskForm}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
@@ -29,5 +29,8 @@ class TaskRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
   val tasks = TableQuery[TaskTable]
 
   def getAll: Future[Seq[Task]] = db.run(tasks.result)
+
+  def create(form: TaskForm): Future[Task] =
+    db.run(tasks returning tasks.map(_.id) into ((x, id) => x.copy(id = Some(id))) += new Task(form))
 
 }

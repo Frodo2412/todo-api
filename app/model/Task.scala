@@ -4,7 +4,13 @@ import play.api.libs.json._
 
 import java.sql.Timestamp
 
-case class Task(id: Option[Int], title: String, description: String, maybeDateDone: Option[Timestamp])
+case class Task(id: Option[Int], title: String, description: String, maybeDateDone: Option[Timestamp] = None) {
+
+  def this(form: TaskForm) = this(None, form.title, form.description)
+
+}
+
+case class TaskForm(title: String, description: String)
 
 object Task {
 
@@ -14,6 +20,8 @@ object Task {
   }
 
   implicit val taskFormat: OFormat[Task] = Json.format[Task]
+
+  implicit val taskFormFormat: OFormat[TaskForm] = Json.format[TaskForm]
 
   def tupled: ((Option[Int], String, String, Option[Timestamp])) => Task = (apply _).tupled
 
