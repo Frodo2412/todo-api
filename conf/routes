@@ -5,6 +5,7 @@
 
 # An example controller showing a sample home page
 GET           /tasks               controllers.TaskController.getAll()
+GET           /tasks/:id           controllers.TaskController.find(id: Int)
 POST          /tasks               controllers.TaskController.create()
 DELETE        /tasks/:id           controllers.TaskController.delete(id: Int)
 PUT           /tasks/:id           controllers.TaskController.update(id: Int)

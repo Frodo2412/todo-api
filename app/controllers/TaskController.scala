@@ -18,17 +18,28 @@ class TaskController @Inject() (repo: TaskRepository, val controllerComponents: 
 
   def getAll: Action[AnyContent] = Action.async { repo.getAll.map(tasks => Ok(Json.toJson(tasks))) }
 
+  def find(id: Int): Action[AnyContent] = Action.async {
+    repo.find(id).map {
+      case Some(value) => Ok(Json.toJson(value))
+      case None        => NotFound
+    }
+  }
+
+  def delete(id: Int): Action[AnyContent] = Action.async { repo.delete(id).map(_ => Ok) }
+
   def create(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     parseRequest(request)
       .map { repo.create(_).map { task => Ok(Json.toJson(task)) } }
       .getOrElse { Future.successful(BadRequest("Expecting JSON data")) }
   }
 
-  def delete(id: Int): Action[AnyContent] = Action.async { repo.delete(id).map(_ => Ok) }
-
   def update(id: Int): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     parseRequest(request)
-      .map { repo.update(id, _).map { task => Ok(Json.toJson(task)) } }
+      .map {
+        repo.update(id, _).map { affectedRows =>
+          if (affectedRows == 0) Ok(s"$affectedRows tasks updated") else Ok("No tasks updated")
+        }
+      }
       .getOrElse { Future.successful(BadRequest("Expecting JSON data")) }
   }
 

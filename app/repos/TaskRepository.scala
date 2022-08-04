@@ -29,7 +29,8 @@ class TaskRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implic
 
   val tasks = TableQuery[TaskTable]
 
-  def getAll: Future[Seq[Task]] = db.run(tasks.result)
+  def getAll: Future[Seq[Task]]           = db.run(tasks.result)
+  def find(id: Int): Future[Option[Task]] = db.run(tasks.filter(_.id === id).result.headOption)
 
   def create(form: TaskForm): Future[Task] =
     db.run(tasks returning tasks.map(_.id) into ((x, id) => x.copy(id = Some(id))) += new Task(form))
